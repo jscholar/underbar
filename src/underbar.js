@@ -93,26 +93,64 @@
     return result;
   };
 
-  // Return all elements of an array that pass a truth test.
+  /**
+   * Return all elements of an array that pass a truth test.
+   * @param {Array} collection
+   * @param {Function} test Returns true to include element.
+   * @returns {Array} Array of elements that pass the filter.
+   */
   _.filter = function(collection, test) {
+    const arr = [];
+    for (let i = 0; i < collection.length; i++) {
+      if (test(collection[i])) arr.push(collection[i]);
+    }
+    return arr;
   };
 
   // Return all elements of an array that don't pass a truth test.
+  /**
+   * @param {Array collection}
+   * @param {Function} test Returns true to reject element
+   * @returns {Array} Array of elements that failed the test.
+   */
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
+    function inverted(arg) {
+      return !test(arg);
+    }
+    return _.filter(collection, inverted);
   };
 
-  // Produce a duplicate-free version of the array.
+  
+  // Produce a duplicate - free version of the array.
+  /**
+   * @param {Array} array
+   * @returns {Array} Duplicate free version of array.
+   */
   _.uniq = function(array, isSorted, iterator) {
+    let uniq = {};
+    for (let i = 0; i < array.length; i++) {
+      uniq[array[i]] = array[i];
+    }
+    return Object.values(uniq);
   };
-
 
   // Return the results of applying an iterator to each element.
+  /**
+   * @param {Array} collection
+   * @param {Function} iterator
+   * @returns {Array} the results of applying an iterator to each element.
+   */
   _.map = function(collection, iterator) {
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    const arr = [];
+    _.each(collection, (e) => {
+      arr.push(iterator(e));
+    })
+    return arr;
   };
 
   /*
@@ -154,6 +192,12 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    const arr = collection.slice()
+    let memo = accumulator === undefined ? arr.shift() : accumulator;
+    while (arr.length > 0) {
+      memo = iterator(memo, arr.shift())
+    }
+    return memo;
   };
 
   // Determine if the array or object contains a given value (using `===`).
