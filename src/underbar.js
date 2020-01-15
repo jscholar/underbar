@@ -130,9 +130,14 @@
    */
   _.uniq = function(array, isSorted, iterator) {
     let uniq = {};
-    for (let i = 0; i < array.length; i++) {
-      uniq[array[i]] = array[i];
-    }
+    _.each(array, (e) => {
+      
+      // Create unique key for values of different types.
+      let key = isSorted ? iterator(e) : e;
+      key = String(key) + typeof key;
+
+      if (!uniq[key]) uniq[key] = e;
+    })
     return Object.values(uniq);
   };
 

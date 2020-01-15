@@ -346,8 +346,13 @@
         var iterator = function(value) { return value === 1; };
         var numbers = [1, 2, 2, 3, 4, 4];
 
-        expect(_.uniq(FILL_ME_IN)).to.eql([1, 2]);
+        expect(_.uniq(numbers, true, iterator)).to.eql([1, 2]);
       });
+
+      it('should handle elements of different types', function() {
+        expect(_.uniq([true, true, 'true'])).to.eql([true, 'true'])
+        expect(_.uniq([1,'1', 1, '1'])).to.eql([1,'1'])
+      })
 
       it('should produce a brand new array instead of modifying the input array', function() {
         var numbers = [1, 2, 1, 3, 1, 4];
