@@ -197,12 +197,26 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
-    const arr = collection.slice()
-    let memo = accumulator === undefined ? arr.shift() : accumulator;
-    while (arr.length > 0) {
-      memo = iterator(memo, arr.shift())
+    if (Array.isArray(collection)) {
+      for (let i = 0; i < collection.length; i++) {
+        if (accumulator === undefined && i === 0) {
+          accumulator = collection[0];
+        } else {
+          accumulator = iterator(accumulator, collection[i])
+        }
+      }
+    } else {
+      let init = false;
+      for (let key in collection) {
+        if (accumulator === undefined && !init) {
+          accumulator = collection[key];
+        } else {
+          accumulator = iterator(accumulator, collection[key])
+        }
+        init = true;
+      }
     }
-    return memo;
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -221,6 +235,10 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    return _.reduce(collection, function(every, item) {
+      if (!every) return false;
+      return iterator(item);
+    }, true)
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
@@ -288,15 +306,15 @@
     };
   };
 
-  // Memorize an expensive function's results by storing them. You may assume
+  // accumulatorrize an expensive function's results by storing them. You may assume
   // that the function only takes primitives as arguments.
-  // memoize could be renamed to oncePerUniqueArgumentList; memoize does the
+  // accumulatorize could be renamed to oncePerUniqueArgumentList; accumulatorize does the
   // same thing as once, but based on many sets of unique arguments.
   //
-  // _.memoize should return a function that, when called, will check if it has
+  // _.accumulatorize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
-  _.memoize = function(func) {
+  _.accumulatorize = function(func) {
   };
 
   // Delays a function for the given number of milliseconds, and then calls
