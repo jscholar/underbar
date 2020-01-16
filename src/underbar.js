@@ -116,8 +116,8 @@
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
-    function inverted(arg) {
-      return !test(arg);
+    function inverted() {
+      return !test.apply(this, arguments);
     }
     return _.filter(collection, inverted);
   };
@@ -234,10 +234,12 @@
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
-    // TIP: Try re-using reduce() here.
+    // TIP: Try re-using reduce() here. Inefficient?
+    if (!iterator) iterator = _.identity;
+    
     return _.reduce(collection, function(every, item) {
       if (!every) return false;
-      return iterator(item);
+      return Boolean(iterator(item))
     }, true)
   };
 
@@ -245,6 +247,11 @@
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (!iterator) iterator = _.identity;
+
+    return !_.every(collection, function() {
+      return !iterator.apply(this, arguments);
+    })
   };
 
 
@@ -266,12 +273,24 @@
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
-  _.extend = function(obj) {
+  _.extend = function(obj, ...sources) {
+    _.each(sources, source => {
+      for (let property in source) {
+        obj[property] = source[property];
+      }
+    })
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function(obj) {
+  _.defaults = function(obj, ...sources) {
+    _.each(sources, source => {
+      for (let property in source) {
+        if (obj[property] === undefined) obj[property] = source[property];
+      }
+    })
+    return obj;
   };
 
 
@@ -314,7 +333,15 @@
   // _.accumulatorize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
-  _.accumulatorize = function(func) {
+  _.memoize = function(func) {
+    let memo = {};
+
+    return function() {
+      let key = JSON.stringify(arguments);
+      if (memo[key] === undefined) memo[key] = func.apply(this, arguments);
+
+      return memo[key];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
