@@ -467,11 +467,26 @@
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+    if (arguments.length === 0) return null;
+
+    let inter = arguments[0];
+    for (let i = 1; i < arguments.length; i++) {
+      inter = _.filter(inter, e => arguments[i].includes(e));
+    }
+
+    return inter;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    let diff = array.slice();
+
+    for (let i = 1; i < arguments.length; i++) {
+      diff = _.reject(diff, e => arguments[i].includes(e));
+    }
+
+    return diff;
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
