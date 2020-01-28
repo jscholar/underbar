@@ -392,8 +392,8 @@
   // Note: You will need to learn a bit about .apply to complete this.
   _.invoke = function(collection, functionOrKey, args) {
     let results = [];
-    
     for (var i = 0; i < collection.length; i++) {
+      functionOrKey = typeof functionOrKey === 'string' ? collection[i][functionOrKey] : functionOrKey;
       results[i] = functionOrKey.apply(collection[i], args);
     }
 
@@ -405,6 +405,29 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    if (typeof iterator === 'string') {
+      let property = iterator;
+      iterator = function(e) {
+        return e[property]
+      };
+    }
+
+    let undef = [];
+
+    for (var i = 1 ; i < collection.length; i++) {
+      if (collection[i-1] === undefined) {
+        undef = undef.concat(collection.splice(i-1, 1));
+      }
+      
+      if (iterator(collection[i - 1]) > iterator(collection[i])) {
+        let temp = collection[i];
+        collection[i] = collection[i - 1];
+        collection[i - 1] = temp;
+        if (i > 1) i -= 2;
+      }
+    }
+
+    return collection.concat(undef);
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -413,6 +436,16 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    let length = _.reduce(arguments, (maxLength, arr) => Math.max(maxLength, arr.length), 0);
+
+    let zipped = [];
+
+    for (let i = 0; i < length; i++) {
+      zipped.push(
+        _.map( arguments, arr => arr[i] )
+      );
+    }
+    return zipped;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
