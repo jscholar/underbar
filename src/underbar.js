@@ -495,5 +495,17 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
+    let cooldown = false;
+    return function() {
+      if (!cooldown) {
+        cooldown = true;
+        setTimeout(() => {
+          cooldown = false;
+        }, wait);
+        func.apply(this, arguments);
+      } else {
+        alert('function ' + func + ' is on cooldown');
+      }
+    }
   };
 }());
