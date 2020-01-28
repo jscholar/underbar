@@ -504,7 +504,7 @@
         }, wait);
         func.apply(this, arguments);
       } else {
-        alert('function ' + func + ' is on cooldown');
+        console.log('function "' + func + '" is on cooldown');
       }
     }
   };
